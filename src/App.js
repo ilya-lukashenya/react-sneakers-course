@@ -1,111 +1,120 @@
-import logo from './logo.svg';
+import React from 'react';
+import { Route } from 'react-router-dom';
 import './App.css';
 import 'macro-css';
+import axios from 'axios';
+import Header from './components/Header';
+import Drawer from './components/Drawer';
+
+import Favorites from './pages/Favorites';
+import Home from './pages/Home';
+
 
 function App() {
+
+  const[items, setItems] = React.useState([]);
+
+  const[cartItems, setCartItems] = React.useState([]);
+
+  const[favorites, setFavorites] = React.useState([]);
+
+  const[searchValue, setSearchValue] = React.useState('');
+
+  const [cartOpened, setCartOpened] = React.useState(false);
+
+  React.useEffect(() => {
+    axios.get('https://651dfc1f44e393af2d5a734c.mockapi.io/items').then((res) => {
+      setItems(res.data);
+    });
+
+    axios.get('https://651dfc1f44e393af2d5a734c.mockapi.io/cart').then((res) => {
+      setCartItems(res.data);
+    });
+
+    axios.get('https://653883dba543859d1bb18400.mockapi.io/favorite').then((res) => {
+      setFavorites(res.data);
+    });
+    
+    /*fetch('https://651dfc1f44e393af2d5a734c.mockapi.io/items')
+      .then((res) => {
+        return res.json();
+      })
+      .then((json) => {
+        setItems(json);
+      })*/
+
+
+  }, []);
+
+  const onAddToCart = (obj) => {
+    if(favorites.find(item => Number(item.id) === Number(obj.id))) {
+      axios.delete(`https://651dfc1f44e393af2d5a734c.mockapi.io/cart/${obj.id}`);
+      setCartItems(prev => prev.filter(item => Number(item.id) != Number(obj.id)));
+    }
+    else {
+      axios.post('https://651dfc1f44e393af2d5a734c.mockapi.io/cart', obj);
+      setCartItems((prev) => [...prev, obj]);
+    }
+    /**/
+  };
+
+  const onAddToFavorite = async (obj) => {
+    try {
+      if(favorites.find(favObj => favObj.id === obj.id)) {
+        axios.delete(`https://653883dba543859d1bb18400.mockapi.io/favorite/${obj.id}`);
+        setFavorites((prev) => prev.filter((item) => item.id != obj.id));
+      }
+      else {
+        const rep = await axios.post('https://653883dba543859d1bb18400.mockapi.io/favorite', obj);
+        setFavorites((prev) => [...prev, obj]);
+      }
+    } catch (error) {
+      alert('No');
+    }
+    
+  };
+
+
+  const onRemoveItem = (id) => {
+    axios.delete(`https://651dfc1f44e393af2d5a734c.mockapi.io/cart/${id}`);
+    setCartItems((prev) => prev.filter(item => item.id != id));
+  };
+
+  const onChangeSearchInput = (event) => {
+    setCartItems(event.target.value);
+  }
+
   return (
     <div className="wrapper clear">
-      <header className="d-flex justify-between align-center p-40">
-        <div className="d-flex align-center">
-          <img width={40} height={40} src="/img/logo512.png" />
-          <div>
-            <h3 className="text-uppercase">React Sneakers</h3>
-            <p className="opacity-5">Магазин лучших кроссовок</p>
-          </div>
-        </div>
-        <ul className="d-flex">
-          <li className="mr-30">
-            <img width={18} height={18} src="/img/pngwing.com.png" />
-            <span>1205 руб.</span>
-          </li>
-          <li>
-            <img width={18} height={18} src="/img/noavatar.png" />
+      
+      {cartOpened && <Drawer items={cartItems} onClose={() => setCartOpened(false)} onRemove ={ onRemoveItem} />}
 
-          </li>
-        </ul>
-      </header>
-      <div className="content p-40">
-        <h1 className="mb-40">Все кросcовки </h1>
+      
 
 
-        <div className="d-flex">
+      
+      
+      <Header onClickCart={() => setCartOpened(true)} />
+      
 
-        <div className="card">
-          <img width={133} height={113} src="/img/sneakers/1.jpg"
-          alt="Sneakers" />
-          <h5>Мужские Кроссовки Nike Blzer</h5>
-          <div className="d-flex justify-between align-center">
-            <div className="d-flex flex-column ">
-              <span>Цена: </span>
-              <b>12 999 руб.</b>
-            </div>
-            <button className="button">
-              <img width={20} height={20} src="/img/icons8-plus-button-50.png" alt="plus" />
-            </button>
-          </div>
-        </div>
-        <div className="card">
-          <img width={133} height={113} src="/img/sneakers/2.jpg"
-          alt="Sneakers" />
-          <h5>Мужские Кроссовки Nike Blzer</h5>
-          <div className="d-flex justify-between align-center">
-            <div className="d-flex flex-column ">
-              <span>Цена: </span>
-              <b>12 999 руб.</b>
-            </div>
-            <button className="button">
-              <img width={20} height={20} src="/img/icons8-plus-button-50.png" alt="plus" />
-            </button>
-          </div>
-        </div>
-        <div className="card">
-          <img width={133} height={113} src="/img/sneakers/3.png"
-          alt="Sneakers" />
-          <h5>Мужские Кроссовки Nike Blzer</h5>
-          <div className="d-flex justify-between align-center">
-            <div className="d-flex flex-column ">
-              <span>Цена: </span>
-              <b>12 999 руб.</b>
-            </div>
-            <button className="button">
-              <img width={20} height={20} src="/img/icons8-plus-button-50.png" alt="plus" />
-            </button>
-          </div>
-        </div>
-        
-        
-        <div className="card">
-          <img width={133} height={113} src="/img/sneakers/4.png"
-          alt="Sneakers" />
-          <h5>Мужские Кроссовки Nike Blzer</h5>
-          <div className="d-flex justify-between align-center">
-            <div className="d-flex flex-column ">
-              <span>Цена: </span>
-              <b>12 999 руб.</b>
-            </div>
-            <button className="button">
-              <img width={20} height={20} src="/img/icons8-plus-button-50.png" alt="plus" />
-            </button>
-          </div>
-        </div>
+      <Route path="/" exact>
+      <Home
+            items={items}
+            cartItems={cartItems}
+            searchValue={searchValue}
+            setSearchValue={setSearchValue}
+            onChangeSearchInput={onChangeSearchInput}
+            onAddToFavorite={onAddToFavorite}
+            onAddToCart={onAddToCart}
+          />
+      </Route>
 
-        <div className="card">
-          <img width={133} height={113} src="/img/sneakers/5.png"
-          alt="Sneakers" />
-          <h5>Мужские Кроссовки Nike Blzer</h5>
-          <div className="d-flex justify-between align-center">
-            <div className="d-flex flex-column ">
-              <span>Цена: </span>
-              <b>12 999 руб.</b>
-            </div>
-            <button className="button">
-              <img width={20} height={20} src="/img/icons8-plus-button-50.png" alt="plus" />
-            </button>
-          </div>
-        </div>
-
-        </div>
-      </div>
+      <Route path="/favorites">
+        <Favorites 
+          items={favorites}
+          onAddToFavorite = {onAddToFavorite}/>
+      </Route>
+      
     </div>
   );
 }
