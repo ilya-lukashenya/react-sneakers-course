@@ -1,3 +1,7 @@
+# React Sneakers 
+
+This project is example of sneakers shop and was developed related [this course](https://www.youtube.com/watch?v=ptiom4YWqoE&list=PL0FGkDGJQjJEos_0yVkbKjsQ9zGVy3dG7).
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
